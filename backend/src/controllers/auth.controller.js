@@ -143,61 +143,61 @@ export const checkAuth = async (req, res) => {
     }
 }
 
-export const getContactList = async (req, res) => {
-    try {
-    const userId = req.user._id;
+// export const getContactList = async (req, res) => {
+//     try {
+//     const userId = req.user._id;
 
-    const user = await User.findById(userId)
-      .populate('contacts', '-password -createdAt -updatedAt -contacts -__v') // Populate contacts with user details, excluding sensitive fields
-      .select('contacts'); // Get only contacts field, optional
+//     const user = await User.findById(userId)
+//       .populate('contacts', '-password -createdAt -updatedAt -contacts -__v') // Populate contacts with user details, excluding sensitive fields
+//       .select('contacts'); // Get only contacts field, optional
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
 
-    res.status(200).json({ contacts: user.contacts });
+//     res.status(200).json({ contacts: user.contacts });
 
-  } catch (error) {
-    console.error("Error fetching contacts:", error.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
-}
+//   } catch (error) {
+//     console.error("Error fetching contacts:", error.message);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// }
 
-export const addContacts = async (req, res) => {
-  try {
-    const userId = req.user._id; // Assuming you use some auth middleware
-    const { email } = req.body;
+// export const addContacts = async (req, res) => {
+//   try {
+//     const userId = req.user._id; // Assuming you use some auth middleware
+//     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
+//     if (!email) {
+//       return res.status(400).json({ message: "Email is required" });
+//     }
 
-    // Find the contact user by email
-    const contactUser = await User.findOne({ email }).select("_id");
+//     // Find the contact user by email
+//     const contactUser = await User.findOne({ email }).select("_id");
 
-    if (!contactUser) {
-      return res.status(404).json({ message: "Contact user not found" });
-    }
+//     if (!contactUser) {
+//       return res.status(404).json({ message: "Contact user not found" });
+//     }
 
-    // Prevent user from adding themselves
-    if (String(contactUser._id) === String(userId)) {
-      return res.status(400).json({ message: "You cannot add yourself as a contact" });
-    }
+//     // Prevent user from adding themselves
+//     if (String(contactUser._id) === String(userId)) {
+//       return res.status(400).json({ message: "You cannot add yourself as a contact" });
+//     }
 
-    // Add to contacts only if not already present
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { contacts: contactUser._id } }, // <- Use $addToSet to avoid duplicates
-      { new: true }
-    );
+//     // Add to contacts only if not already present
+//     const updatedUser = await User.findByIdAndUpdate(
+//       userId,
+//       { $addToSet: { contacts: contactUser._id } }, // <- Use $addToSet to avoid duplicates
+//       { new: true }
+//     );
 
-    res.status(200).json({
-      message: "Contact added successfully",
-      contacts: updatedUser.contacts,
-    });
+//     res.status(200).json({
+//       message: "Contact added successfully",
+//       contacts: updatedUser.contacts,
+//     });
 
-  } catch (error) {
-    console.error("Error in addContacts controller:", error.message);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+//   } catch (error) {
+//     console.error("Error in addContacts controller:", error.message);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
