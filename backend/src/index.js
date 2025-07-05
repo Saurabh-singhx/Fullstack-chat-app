@@ -7,15 +7,12 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { server, app } from "./lib/socket.js";
 import path from "path";
-import { fileURLToPath } from "url";
 
-// // ✅ Add these two lines to fix __dirname in ESM
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
 const PORT = process.env.PORT;
+const __dirname = path.resolve();
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
