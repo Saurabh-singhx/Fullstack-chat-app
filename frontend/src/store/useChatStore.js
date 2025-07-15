@@ -2,10 +2,13 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 import { useAuthStore } from "./useAuthStore";
+import user from "../../../backend/src/models/user.model";
+import { use } from "react";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
   users: [],
+  searchedUser: [],
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
@@ -13,7 +16,7 @@ export const useChatStore = create((set, get) => ({
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
-      const res = await axiosInstance.get("/messages/users");
+      const res = await axiosInstance.get("/auth/contacts");
       set({ users: res.data });
     } catch (error) {
       toast.error(error.response.data.message);
@@ -21,6 +24,48 @@ export const useChatStore = create((set, get) => ({
       set({ isUsersLoading: false });
     }
   },
+
+  getSearchedUser: async (data) => {
+    const { searchedUser } = get();
+    set({ isUsersLoading: true });
+
+    try {
+      const res = await axiosInstance.get(`/auth/searchcontacts`, {
+        params: { searchID: data },
+      });
+
+      set({ searchedUser: res.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      set({ isUsersLoading: false });
+    }
+  },
+
+  addSearchedContact: async (email) => {
+
+    const { users } = get();
+    const { searchedUser } = get();
+    try {
+      const res = await axiosInstance.post("/auth/addcontact", { email });
+      // const alreadyExists = users.some((u) => u._id === searchedUser._id);
+
+      const currdata = res.data.contacts;
+      // console.log("currdata", currdata);
+      // console.log(users, "users");
+      if(!currdata || currdata.length === 0) {
+        set({ users: [...users,currdata] });
+      }
+      // console.log(users, "users after adding contact");
+      // console.log("res.data", res.data.contacts);
+      toast.success("Contact added successfully");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      set({ searchedUser: '' });
+    }
+  },
+
 
   getMessages: async (userId) => {
     set({ isMessagesLoading: true });

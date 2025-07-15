@@ -56,7 +56,7 @@ const ChatContainer = () => {
             ref={messageEndRef}
           >
             <div className=" chat-image avatar">
-              <div className="size-10 rounded-full border">
+              <div className="size-10 rounded-full border ">
                 <img
                   src={
                     message.senderId === authUser._id
@@ -72,7 +72,7 @@ const ChatContainer = () => {
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
-            <div className="chat-bubble flex flex-col">
+            <div className={`chat-bubble flex flex-col  ${message.senderId === authUser._id ? "bg-primary text-primary-content" :"bg-base-300 text-base-content/70" }`}>
               {message.image && (
                 <img
                   src={message.image}
